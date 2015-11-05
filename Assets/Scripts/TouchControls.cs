@@ -10,13 +10,15 @@ public class TouchControls : MonoBehaviour
     private Vector3 touchStartLocation;
     private bool isFirstTouch;
     public int speed;
-    private Vector3 intialPosition;
-    private Vector3 directionOfmovement;
+    private Vector3 initalPosition;
+    
+
 
     void Start()
     {
         isFirstTouch = true;
-        intialPosition = transform.position;
+        initalPosition = transform.position;
+      
 
     }
 
@@ -57,7 +59,7 @@ public class TouchControls : MonoBehaviour
                 Vector3 direction = touchFinalLocation - currentPostion;
                 direction.z = 1;
                 int magnitudeOfForce = speed;
-                directionOfmovement = direction;
+         
                 
                 player.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
             }
@@ -69,13 +71,26 @@ public class TouchControls : MonoBehaviour
 
 
     }
+    public void captureImage()
+    {
+
+        GameObject plane = GameObject.FindGameObjectWithTag("Plane");
+        plane.transform.position = initalPosition;
+        plane.transform.localScale = new Vector3(2,2,2);
+        Camera.main.transform.position = new Vector3(0.0f,1.0f,-1.0f);
+        Application.CaptureScreenshot("Assets/Screenshot.png");
+    }
 
     void OnCollisionEnter(Collision collision)
     {
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.position = intialPosition;
+        GameObject plane = GameObject.FindGameObjectWithTag("Plane");
+        collision.gameObject.transform.SetParent(plane.gameObject.transform);
+     
+        
+        //transform.position = intialPosition;
 
 
     }

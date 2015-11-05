@@ -52,26 +52,20 @@ public class TouchControls : MonoBehaviour
                 touchFinalLocation.z = 10;
                 touchFinalLocation = Camera.main.ScreenToWorldPoint(touchFinalLocation);
                 touchFinalLocation.Normalize();
-                Vector3 normalizeCameraPosition = transform.position;
-                normalizeCameraPosition.Normalize();
-                Vector3 direction = touchFinalLocation - normalizeCameraPosition;
-                int magnitudeOfForce = speed;// + (int)touchDiffrenceX + (int)touchDiffrenceY;
+                Vector3 currentPostion = transform.position;
+                currentPostion.Normalize();
+                Vector3 direction = touchFinalLocation - currentPostion;
+                direction.z = 1;
+                int magnitudeOfForce = speed;
                 directionOfmovement = direction;
-                // player.GetComponent<Rigidbody>().AddForce(direction * magnitudeOfForce);
+                
                 player.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
             }
 
 
         }
     
-        if(transform.position.z > 10 )
-        {
-
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            player.GetComponent<Rigidbody>().velocity = 0 * directionOfmovement;
-            transform.position = intialPosition;
-
-        }
+  
 
 
     }
@@ -80,7 +74,7 @@ public class TouchControls : MonoBehaviour
     {
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<Rigidbody>().velocity = 0 * directionOfmovement;
+        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.position = intialPosition;
 
 

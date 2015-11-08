@@ -10,16 +10,13 @@ public class TouchControls : MonoBehaviour
     private Vector3 touchStartLocation;
     private bool isFirstTouch;
     public int speed;
-    private Vector3 initalPosition;
+  
     
 
 
     void Start()
     {
         isFirstTouch = true;
-        initalPosition = transform.position;
-      
-
     }
 
     // Update is called once per frame
@@ -58,9 +55,7 @@ public class TouchControls : MonoBehaviour
                 currentPostion.Normalize();
                 Vector3 direction = touchFinalLocation - currentPostion;
                 direction.z = 1;
-                int magnitudeOfForce = speed;
-         
-                
+                int magnitudeOfForce = speed;  
                 player.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
             }
 
@@ -75,23 +70,18 @@ public class TouchControls : MonoBehaviour
     {
 
         GameObject plane = GameObject.FindGameObjectWithTag("Plane");
-        plane.transform.position = initalPosition;
-        plane.transform.localScale = new Vector3(2,2,2);
-        Camera.main.transform.position = new Vector3(0.0f,1.0f,-1.0f);
+        Vector3 newPositionForCamera =  plane.transform.position;
+        newPositionForCamera.z -= 4.0f;
+        newPositionForCamera.y = Camera.main.transform.position.y;
+        newPositionForCamera.x = Camera.main.transform.position.x;
+        plane.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+        Camera.main.transform.position = newPositionForCamera;
         Application.CaptureScreenshot("Assets/Screenshot.png");
     }
 
     void OnCollisionEnter(Collision collision)
     {
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GameObject plane = GameObject.FindGameObjectWithTag("Plane");
-        collision.gameObject.transform.SetParent(plane.gameObject.transform);
-     
-        
-        //transform.position = intialPosition;
-
-
+        gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        gameObject.transform.SetParent(collision.collider.gameObject.transform);
     }
 }

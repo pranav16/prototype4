@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TouchControls : MonoBehaviour
 {
@@ -8,22 +9,26 @@ public class TouchControls : MonoBehaviour
 
     public int swipeDistance;
     private Vector3 touchStartLocation;
-    private bool isFirstTouch;
     public int speed;
+    public float horizontalSpeed;
+    public string state;
+ 
+    
   
     
 
 
     void Start()
     {
-        isFirstTouch = true;
+     
+        state = "init";
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        if (Input.GetMouseButton(0) && isFirstTouch)
+        if (Input.GetMouseButton(0) && state == "init")
         {
             Vector3 mousePostion = Input.mousePosition;
             mousePostion.z = 10;
@@ -34,35 +39,41 @@ public class TouchControls : MonoBehaviour
                 if (hit.collider.gameObject.tag == "Player")
                 {
                     touchStartLocation = mousePostion;
-                    isFirstTouch = false;
+                    state = "swipeStart";
                 }
             }
         }
-        else if (!isFirstTouch)
+        else if (Input.GetMouseButton(0)  && state == "swipeStart")
         {
-            isFirstTouch = true;
-
+        
             double touchDiffrenceY = Mathf.Abs(touchStartLocation.y - Input.mousePosition.y);
             double touchDiffrenceX = Mathf.Abs(touchStartLocation.x - Input.mousePosition.x);
             if (touchDiffrenceX >= swipeDistance || touchDiffrenceY >= swipeDistance)
             {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
                 Vector3 touchFinalLocation = Input.mousePosition;
                 touchFinalLocation.z = 10;
+                touchStartLocation = touchFinalLocation;
                 touchFinalLocation = Camera.main.ScreenToWorldPoint(touchFinalLocation);
                 touchFinalLocation.Normalize();
                 Vector3 currentPostion = transform.position;
                 currentPostion.Normalize();
-                Vector3 direction = touchFinalLocation - currentPostion;
+                Vector3 direction= touchFinalLocation - currentPostion;
+
                 direction.z = 1;
+                direction.Normalize();
                 int magnitudeOfForce = speed;  
-                player.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
+                gameObject.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
+                state = "moving";
             }
-
-
         }
-    
-  
+        else if (state != "moving" && state != "stuck" && !Input.GetMouseButton(0))
+        {
+            Vector3 position = gameObject.transform.position;
+            position.x += horizontalSpeed * Time.deltaTime;
+            gameObject.transform.position = position;
+            state = "init";
+        }
+
 
 
     }
@@ -76,11 +87,16 @@ public class TouchControls : MonoBehaviour
         newPositionForCamera.x = Camera.main.transform.position.x;
         plane.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
         Camera.main.transform.position = newPositionForCamera;
-        Application.CaptureScreenshot("Assets/Screenshot.png");
+        int screenShotNumber = PlayerPrefs.GetInt("ScreenShotNumber",0);
+        string filePath = "Assets/Screenshot/screenshot" + screenShotNumber + ".png";
+        Application.CaptureScreenshot(filePath);
+        screenShotNumber++;
+        PlayerPrefs.SetInt("ScreenShotNumber",screenShotNumber);
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        state = "stuck";
         gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         gameObject.transform.SetParent(collision.collider.gameObject.transform);
     }

@@ -25,7 +25,7 @@ public class TouchControls : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+   public void Update()
     {
 
         if (Input.GetMouseButton(0) && state == "init")
@@ -36,24 +36,23 @@ public class TouchControls : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.gameObject.tag == "Player")
+                if (hit.collider.gameObject == gameObject)
                 {
                     touchStartLocation = mousePostion;
                     state = "swipeStart";
                 }
             }
         }
-        else if (Input.GetMouseButton(0)  && state == "swipeStart")
+        else if (!Input.GetMouseButton(0)  && state == "swipeStart")
         {
-        
-            double touchDiffrenceY = Mathf.Abs(touchStartLocation.y - Input.mousePosition.y);
-            double touchDiffrenceX = Mathf.Abs(touchStartLocation.x - Input.mousePosition.x);
+            Vector3 touchFinalLocation = Input.mousePosition;
+            touchFinalLocation.z = 10;
+            touchFinalLocation = Camera.main.ScreenToWorldPoint(touchFinalLocation);
+            double touchDiffrenceY = Mathf.Abs(touchStartLocation.y - touchFinalLocation.y);
+            double touchDiffrenceX = Mathf.Abs(touchStartLocation.x - touchFinalLocation.x);
             if (touchDiffrenceX >= swipeDistance || touchDiffrenceY >= swipeDistance)
             {
-                Vector3 touchFinalLocation = Input.mousePosition;
-                touchFinalLocation.z = 10;
                 touchStartLocation = touchFinalLocation;
-                touchFinalLocation = Camera.main.ScreenToWorldPoint(touchFinalLocation);
                 touchFinalLocation.Normalize();
                 Vector3 currentPostion = transform.position;
                 currentPostion.Normalize();
@@ -66,17 +65,25 @@ public class TouchControls : MonoBehaviour
                 state = "moving";
             }
         }
-        else if (state != "moving" && state != "stuck" && !Input.GetMouseButton(0))
+        if (state == "init" && !Input.GetMouseButton(0))
         {
             Vector3 position = gameObject.transform.position;
             position.x += horizontalSpeed * Time.deltaTime;
             gameObject.transform.position = position;
             state = "init";
         }
-
-
-
+       
     }
+    public void setState(string state)
+    {
+        this.state = state;
+    }
+
+    public string getState()
+    {
+        return state;
+    }
+
     public void captureImage()
     {
 
@@ -96,8 +103,11 @@ public class TouchControls : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        state = "stuck";
-        gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        gameObject.transform.SetParent(collision.collider.gameObject.transform);
+        if (collision.gameObject.tag == "Plane")
+        {
+            state = "stuck";
+            gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            gameObject.transform.SetParent(collision.collider.gameObject.transform);
+        }
     }
 }

@@ -39,10 +39,14 @@ public class TouchControls : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.gameObject == gameObject)
+                BoxCollider[] colliders = gameObject.GetComponentsInChildren<BoxCollider>();
+                for (int i = 0; i < colliders.Length; i++)
                 {
-                
-                    state = "swipeStart";
+                    if (hit.collider == colliders[i])
+                    {
+
+                        state = "swipeStart";
+                    }
                 }
             }
         }
@@ -61,7 +65,7 @@ public class TouchControls : MonoBehaviour
                 currentPostion.Normalize();
                 Vector3 direction= touchFinalLocation - currentPostion;
                 direction.z = 1;
-                if(direction.y < -0.5f)
+                if(direction.y < -0.6f)
                 {
                     direction.y = 0.0f;
                 }
@@ -72,9 +76,13 @@ public class TouchControls : MonoBehaviour
                 }
 
                 direction.Normalize();
-                int magnitudeOfForce = speed;  
-                gameObject.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
-                state = "moving";
+                int magnitudeOfForce = speed;
+                Rigidbody[] bodies = gameObject.GetComponentsInChildren<Rigidbody>();
+                for (int i = 0; i < bodies.Length; i++)
+                {
+                    bodies[i].velocity = direction * magnitudeOfForce;
+                }
+              state = "moving";
             }
         }
         if (state == "init" && !Input.GetMouseButton(0))
@@ -102,7 +110,12 @@ public class TouchControls : MonoBehaviour
         if (collision.gameObject.tag == "Plane")
         {
             state = "stuck";
-            gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            Rigidbody[] bodies = gameObject.GetComponentsInChildren<Rigidbody>();
+            for (int i = 0; i < bodies.Length; i++)
+            {
+                bodies[i].velocity = Vector3.zero; ;
+            }
+           
             gameObject.transform.SetParent(collision.collider.gameObject.transform);
         }
     }

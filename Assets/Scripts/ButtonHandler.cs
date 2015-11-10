@@ -15,12 +15,12 @@ public class ButtonHandler : MonoBehaviour {
     public void captureImage()
     {
 
-  
+        GameObject onBject = GameObject.FindGameObjectWithTag("Plane");
         Vector3 newPositionForCamera = transform.position;
         newPositionForCamera.z -= 4.0f;
         newPositionForCamera.y = Camera.main.transform.position.y;
         newPositionForCamera.x = Camera.main.transform.position.x;
-        transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        onBject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         Camera.main.transform.position = newPositionForCamera;
         int screenShotNumber = PlayerPrefs.GetInt("ScreenShotNumber", 0);
         string filePath = "Assets/Screenshot/screenshot" + screenShotNumber + ".png";

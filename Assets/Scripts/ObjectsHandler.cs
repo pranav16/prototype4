@@ -27,7 +27,7 @@ public class ObjectsHandler : MonoBehaviour {
             intervalCounter = 0;
         }
 
-        List<GameObject> tempList = listOfThrowableObjects;
+  
         for (int i = 0; i < listOfThrowableObjects.Count; i++)
         {
             TouchControls control = listOfThrowableObjects[i].GetComponent<TouchControls>();
@@ -50,18 +50,20 @@ public class ObjectsHandler : MonoBehaviour {
                 continue;
             }
 
-            //control.LocalUpdate();
+      
 
         }
 
 
     }
 
+
+
     private void spawnNewElement()
     {
 
        int  index = Random.Range(0, listOfAvailableObjects.Count);
-        Vector3 position = new Vector3(-4.0f, 0.02f, -8.02f);
+        Vector3 position = new Vector3(-4.0f, 0.0f, -8.02f);
         GameObject gobject = Instantiate(listOfAvailableObjects[index]);
         gobject.transform.position = position;
         listOfThrowableObjects.Add(gobject);

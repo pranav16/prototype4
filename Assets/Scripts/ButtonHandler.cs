@@ -14,13 +14,7 @@ public class ButtonHandler : MonoBehaviour {
 	}
     public void captureImage()
     {
-
-        GameObject onBject = GameObject.FindGameObjectWithTag("Plane");
-        Vector3 newPositionForCamera = transform.position;
-        newPositionForCamera.z -= 4.0f;
-        newPositionForCamera.y = Camera.main.transform.position.y;
-        newPositionForCamera.x = Camera.main.transform.position.x;
-        onBject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        Vector3 newPositionForCamera = new Vector3(0.0f,1.0f,-5.78f);
         Camera.main.transform.position = newPositionForCamera;
         int screenShotNumber = PlayerPrefs.GetInt("ScreenShotNumber", 0);
         string filePath = "Assets/Screenshot/screenshot" + screenShotNumber + ".png";
@@ -28,4 +22,19 @@ public class ButtonHandler : MonoBehaviour {
         screenShotNumber++;
         PlayerPrefs.SetInt("ScreenShotNumber", screenShotNumber);
     }
+
+
+    public void OnCollisionEnter(Collision collision)
+    {
+
+        TouchControls control = collision.gameObject.GetComponentInParent<TouchControls>();
+        if (control)
+            control.handleCollisions(gameObject);
+        TouchControlRegularObjects rcontrol = collision.gameObject.GetComponentInParent<TouchControlRegularObjects>();
+        if (rcontrol)
+        rcontrol.handleCollisions(gameObject);
+
+    }
 }
+
+

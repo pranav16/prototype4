@@ -12,17 +12,16 @@ public class TouchControls : MonoBehaviour
     public int speed;
     public float horizontalSpeed;
     public string state;
-
- 
-    
-  
-    
-
+    private BoxCollider Hitcollider;
+    private float timerBeforeDestruction;
+    public float maxObjectLife;
 
     void Start()
     {
      
         state = "init";
+        timerBeforeDestruction = 0.0f;
+     
       
         
     }
@@ -30,7 +29,11 @@ public class TouchControls : MonoBehaviour
     // Update is called once per frame
    public void Update()
     {
-
+        timerBeforeDestruction++;
+        if (state == "stuck")
+            return;
+        if (timerBeforeDestruction >= maxObjectLife)
+            Destroy(gameObject);
         if (Input.GetMouseButton(0) && state == "init")
         {
             Vector3 mousePostion = Input.mousePosition;
@@ -44,7 +47,7 @@ public class TouchControls : MonoBehaviour
                 {
                     if (hit.collider == colliders[i])
                     {
-
+                        Hitcollider = colliders[i];
                         state = "swipeStart";
                     }
                 }
@@ -65,24 +68,29 @@ public class TouchControls : MonoBehaviour
                 currentPostion.Normalize();
                 Vector3 direction= touchFinalLocation - currentPostion;
                 direction.z = 1;
-                if(direction.y < -0.6f)
+                if (direction.y < 0.0f)
                 {
                     direction.y = 0.0f;
                 }
 
-                if(direction.y > 0.5f)
+                if (direction.y > 0.5f)
                 {
                     direction.y = 0.5f;
                 }
 
+                if (direction.x < -0.55f)
+                {
+                    direction.x = -0.55f;
+                }
+                if (direction.x > 0.6f)
+                {
+                    direction.x = 0.6f;
+                }
                 direction.Normalize();
                 int magnitudeOfForce = speed;
-                Rigidbody[] bodies = gameObject.GetComponentsInChildren<Rigidbody>();
-                for (int i = 0; i < bodies.Length; i++)
-                {
-                    bodies[i].velocity = direction * magnitudeOfForce;
-                }
-              state = "moving";
+                Hitcollider.gameObject.GetComponent<Rigidbody>().velocity = direction * magnitudeOfForce;
+                Hitcollider.gameObject.GetComponent<Rigidbody>().useGravity = true;
+               state = "moving";
             }
         }
         if (state == "init" && !Input.GetMouseButton(0))
@@ -105,18 +113,22 @@ public class TouchControls : MonoBehaviour
     }
 
 
-    void OnCollisionEnter(Collision collision)
+   public void handleCollisions(GameObject Planeobject)
     {
-        if (collision.gameObject.tag == "Plane")
+        
+        state = "stuck";
+        BoxCollider[] colliders = gameObject.GetComponentsInChildren<BoxCollider>();
+        Rigidbody[] bodies = gameObject.GetComponentsInChildren<Rigidbody>();
+        //Hitcollider.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        for (int i = 0; i < colliders.Length; i++)
         {
-            state = "stuck";
-            Rigidbody[] bodies = gameObject.GetComponentsInChildren<Rigidbody>();
+            colliders[i].enabled = false;
+        }
             for (int i = 0; i < bodies.Length; i++)
             {
-                bodies[i].velocity = Vector3.zero; ;
-            }
-           
-            gameObject.transform.SetParent(collision.collider.gameObject.transform);
-        }
+            bodies[i].velocity = Vector3.zero;
+            bodies[i].isKinematic = true;
+           }
+
     }
 }

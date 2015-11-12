@@ -17,7 +17,7 @@ public class ButtonHandler : MonoBehaviour {
         if(isButtonClicked == true)
         {
             timer++;
-            if (timer > 30)
+            if (timer > 300)
                 Application.LoadLevel(2);
         }
 

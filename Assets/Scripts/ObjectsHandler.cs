@@ -12,7 +12,7 @@ public class ObjectsHandler : MonoBehaviour {
     void Start () {
 
         
-        intervalCounter = 0;
+        intervalCounter = timeIntervalBetweenSpawn;
 
     }
 
